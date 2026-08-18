@@ -6,10 +6,10 @@
     <meta name="google" content="notranslate">
     <title>Shopping Cart & Checkout | Peptides Factory</title>
     
-    <link rel="canonical" href="https://peptidefactor.github.io/pepsi/cart.html" />
+    <link rel="canonical" href="https://peptidefactor.github.io/pepper/cart.html" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- 引入 EmailJS SDK -->
+    <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
         (function(){
@@ -44,7 +44,7 @@
             z-index: 100;
         }
         .logo-img {
-            height: 90px; 
+            height: 60px; 
             width: auto;
             object-fit: contain;
         }
@@ -65,13 +65,13 @@
         }
         .cart-title { 
             color: var(--primary-color); 
-            font-size: 32px; 
+            font-size: 28px; 
             margin-bottom: 30px; 
             border-bottom: 2px solid #eee; 
             padding-bottom: 10px; 
         }
 
-        /* 左右双栏结构 */
+        /* 左右双栏布局 */
         .cart-layout {
             display: flex;
             gap: 30px;
@@ -101,19 +101,19 @@
         .cart-table th { 
             background-color: var(--primary-color); 
             color: white; 
-            padding: 15px; 
+            padding: 12px 15px; 
             text-align: left; 
-            font-size: 15px;
+            font-size: 14px;
         }
         .cart-table td { 
-            padding: 15px; 
+            padding: 12px 15px; 
             border-bottom: 1px solid #eee; 
             vertical-align: middle; 
         }
         
         .item-image { 
-            width: 60px; 
-            height: 60px; 
+            width: 50px; 
+            height: 50px; 
             object-fit: contain; 
             background: #f0f0f0; 
             border-radius: 6px; 
@@ -147,7 +147,6 @@
             font-size: 14px; 
             border-radius: 4px; 
             font-weight: bold;
-            transition: 0.2s;
         }
         .qty-btn:hover { background: #ddd; }
         .qty-input { 
@@ -166,14 +165,10 @@
             color: #ff4d4d; 
             cursor: pointer; 
             font-size: 16px; 
-            transition: 0.3s; 
         }
-        .delete-btn:hover { 
-            color: #cc0000; 
-            transform: scale(1.1); 
-        }
+        .delete-btn:hover { color: #cc0000; }
 
-        /* 结算表单样式 */
+        /* 表单样式 */
         .form-group {
             margin-bottom: 14px;
         }
@@ -193,10 +188,6 @@
             font-family: inherit;
             font-size: 14px;
         }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
 
         .wallet-card {
             background: #fff;
@@ -208,7 +199,7 @@
         }
 
         .submit-btn { 
-            background-color: #25D366; 
+            background-color: var(--primary-color); 
             color: white; 
             width: 100%; 
             padding: 14px; 
@@ -221,8 +212,8 @@
             margin-top: 10px; 
         }
         .submit-btn:hover { 
-            background-color: #1ebd59; 
-            box-shadow: 0 4px 12px rgba(37,211,102,0.3);
+            background-color: #00d4b2; 
+            color: #0a2540;
         }
 
         .empty-msg { 
@@ -247,17 +238,12 @@
             text-decoration: none; 
             border-radius: 5px; 
             font-weight: bold; 
-            transition: 0.3s; 
-        }
-        .shop-link:hover { 
-            background-color: var(--accent-color); 
-            color: var(--primary-color); 
         }
 
         footer { 
             background-color: #0d1117; 
             color: #9ca3af; 
-            padding: 40px 5% 20px; 
+            padding: 30px 5%; 
             font-size: 14px; 
             text-align: center; 
             margin-top: 80px; 
@@ -267,8 +253,8 @@
 <body>
 
     <header>
-        <a href="index.html" class="logo-container">
-            <img src="logo.png" alt="Logo" class="logo-img">
+        <a href="index.html">
+            <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
         </a>
         <nav>
             <a href="index.html">Home</a>
@@ -278,7 +264,102 @@
 
     <div class="cart-container">
         <h1 class="cart-title">Your Shopping Cart & Direct Checkout</h1>
-        <div id="cart-content"></div>
+        
+        <div id="cart-wrapper">
+            <div class="cart-layout">
+                <!-- 左栏：购物车明细与费用结算 -->
+                <div class="cart-left-table">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-rows">
+                            <!-- 动态插入行 -->
+                        </tbody>
+                    </table>
+
+                    <div style="text-align: right; padding: 20px; background: #fdfdfd; border-radius: 8px; border: 1px solid #eee;">
+                        <p style="margin: 5px 0; color: #666;">Subtotal: <strong style="color: #333;" id="subtotal-val">$0.00</strong></p>
+                        
+                        <div style="margin: 12px 0; display: inline-block; text-align: right;">
+                            <label style="font-size: 13px; font-weight: 600; color: #666; margin-right: 8px;">Shipping Method:</label>
+                            <select id="shipping_fee_select" onchange="calculateGrandTotal()" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
+                                <option value="50">Stealth Express Shipping ($50.00)</option>
+                                <option value="0">Standard Free Shipping ($0.00)</option>
+                            </select>
+                        </div>
+
+                        <p style="margin: 5px 0; color: #666;">Shipping Fee: <strong style="color: #25D366;" id="shipping-fee-val">$50.00</strong></p>
+                        <h3 style="margin: 10px 0 0 0; color: var(--primary-color);">Total: <span id="total-val">$0.00</span></h3>
+                    </div>
+                </div>
+
+                <!-- 右栏：客户信息与付款截图上传 -->
+                <div class="checkout-right-form">
+                    <h3 style="margin-top:0; color:var(--primary-color); font-size:18px;">Shipping & Payment Info</h3>
+                    
+                    <form id="direct-checkout-form" onsubmit="event.preventDefault(); submitDirectCryptoOrder();">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="cust_name" placeholder="John Doe" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address *</label>
+                            <input type="email" id="cust_email" placeholder="john@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>WhatsApp / Telegram *</label>
+                            <input type="text" id="cust_phone" placeholder="+1 234 567 8900" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Detailed Shipping Address *</label>
+                            <textarea id="cust_address" rows="3" placeholder="Street address, city, state, zip code, country" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Crypto Payment Method *</label>
+                            <select id="payment_method" onchange="toggleWalletAddress()">
+                                <option value="USDT-TRC20">USDT (TRC20 - Tron Network)</option>
+                                <option value="USDT-ERC20">USDT (ERC20 - Ethereum Network)</option>
+                                <option value="BTC">Bitcoin (BTC)</option>
+                            </select>
+                        </div>
+
+                        <div class="wallet-card">
+                            <span style="font-size:12px; color:#666;">Send exact total amount to:</span>
+                            <p id="wallet_address" style="font-family:monospace; color:#007bff; font-size:13px; font-weight:bold; margin:6px 0 0 0;">
+                                TB9Cr786LZDYdYNqYHZGExbx4oGYqGMiWj
+                            </p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>TxID / Hash (Optional)</label>
+                            <input type="text" id="txid" placeholder="Paste transaction hash if paid">
+                        </div>
+
+                        <!-- 付款截图上传功能 -->
+                        <div class="form-group">
+                            <label>Upload Payment Proof / Screenshot (Optional)</label>
+                            <input type="file" id="payment_proof" accept="image/*" style="padding: 6px; font-size: 13px;">
+                            <span style="font-size: 11px; color: #888;">Upload your transaction screenshot for faster verification.</span>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submit-btn-text">
+                            Complete & Submit Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer>
@@ -286,12 +367,15 @@
     </footer>
 
     <script>
+        let currentSubtotal = 0;
+
         function loadCart() {
             let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
-            const container = document.getElementById('cart-content');
+            const wrapper = document.getElementById('cart-wrapper');
+            const tbody = document.getElementById('cart-rows');
             
-            if (cart.length === 0) {
-                container.innerHTML = `
+            if (!cart || cart.length === 0) {
+                wrapper.innerHTML = `
                     <div class="empty-msg">
                         <i class="fas fa-shopping-basket"></i>
                         <p>Your shopping cart is empty.</p>
@@ -301,29 +385,34 @@
                 return;
             }
             
-            let subtotal = 0;
+            currentSubtotal = 0;
             let tableRows = '';
             
             cart.forEach((item, index) => {
-                let itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
+                let price = parseFloat(item.price) || 0;
+                let quantity = parseInt(item.quantity) || 1;
+                let itemTotal = price * quantity;
+                currentSubtotal += itemTotal;
                 
+                let specText = item.spec || item.specification || 'Standard';
+                let imgSrc = item.image || item.img || 'placeholder.png';
+
                 tableRows += `
                     <tr>
                         <td>
                             <div class="item-details">
-                                <img src="${item.image}" alt="${item.name}" class="item-image">
+                                <img src="${imgSrc}" alt="${item.name}" class="item-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\' viewBox=\'0 0 50 50\'><rect width=\'50\' height=\'50\' fill=\'%23eee\'/></svg>'">
                                 <div>
                                     <div class="item-name">${item.name}</div>
-                                    <div class="item-spec">Spec: ${item.spec}</div>
+                                    <div class="item-spec">Spec: ${specText}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>$${item.price.toFixed(2)}</td>
+                        <td>$${price.toFixed(2)}</td>
                         <td>
                             <div class="qty-control">
                                 <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
-                                <input type="text" class="qty-input" value="${item.quantity}" readonly>
+                                <input type="text" class="qty-input" value="${quantity}" readonly>
                                 <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
                             </div>
                         </td>
@@ -337,90 +426,19 @@
                 `;
             });
 
-            // 双栏并排 HTML
-            container.innerHTML = `
-                <div class="cart-layout">
-                    <!-- 左栏：商品明细与总计 -->
-                    <div class="cart-left-table">
-                        <table class="cart-table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${tableRows}
-                            </tbody>
-                        </table>
-
-                        <div style="text-align: right; padding: 15px; background: #fdfdfd; border-radius: 8px; border: 1px solid #eee;">
-                            <p style="margin: 5px 0; color: #666;">Subtotal: <strong style="color: #333;">$${subtotal.toFixed(2)}</strong></p>
-                            <p style="margin: 5px 0; color: #666;">Shipping: <strong style="color: #25D366;">Free Stealth Shipping</strong></p>
-                            <h3 style="margin: 10px 0 0 0; color: var(--primary-color);">Total: $${subtotal.toFixed(2)}</h3>
-                        </div>
-                    </div>
-
-                    <!-- 右栏：加密货币直接结算表单 -->
-                    <div class="checkout-right-form">
-                        <h3 style="margin-top:0; color:var(--primary-color); font-size:18px;">Shipping & Crypto Payment</h3>
-                        
-                        <form id="direct-checkout-form" onsubmit="event.preventDefault(); submitDirectCryptoOrder();">
-                            <div class="form-group">
-                                <label>Full Name *</label>
-                                <input type="text" id="cust_name" placeholder="John Doe" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Email Address *</label>
-                                <input type="email" id="cust_email" placeholder="john@example.com" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>WhatsApp / Telegram *</label>
-                                <input type="text" id="cust_phone" placeholder="+1 234 567 8900" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Detailed Shipping Address *</label>
-                                <textarea id="cust_address" rows="3" placeholder="Full street address, city, state, zip code, country" required></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Crypto Payment Method *</label>
-                                <select id="payment_method" onchange="toggleWalletAddress()">
-                                    <option value="USDT-TRC20">USDT (TRC20 - Tron Network)</option>
-                                    <option value="USDT-ERC20">USDT (ERC20 - Ethereum Network)</option>
-                                    <option value="BTC">Bitcoin (BTC)</option>
-                                </select>
-                            </div>
-
-                            <!-- 钱包地址展示卡片 -->
-                            <div class="wallet-card">
-                                <span style="font-size:12px; color:#666;">Send exact amount to address:</span>
-                                <p id="wallet_address" style="font-family:monospace; color:#007bff; font-size:13px; font-weight:bold; margin:6px 0 0 0;">
-                                    TB9Cr786LZDYdYNqYHZGExbx4oGYqGMiWj
-                                </p>
-                            </div>
-
-                            <div class="form-group">
-                                <label>TxID / Hash (Optional)</label>
-                                <input type="text" id="txid" placeholder="Paste transaction hash if paid">
-                            </div>
-
-                            <button type="submit" class="submit-btn">
-                                Complete & Submit Order
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            `;
+            tbody.innerHTML = tableRows;
+            document.getElementById('subtotal-val').textContent = `$${currentSubtotal.toFixed(2)}`;
+            calculateGrandTotal();
         }
-        
-        // 动态切换收款钱包地址
+
+        function calculateGrandTotal() {
+            const shippingFee = parseFloat(document.getElementById('shipping_fee_select').value) || 0;
+            const grandTotal = currentSubtotal + shippingFee;
+
+            document.getElementById('shipping-fee-val').textContent = shippingFee > 0 ? `$${shippingFee.toFixed(2)}` : 'Free Shipping';
+            document.getElementById('total-val').textContent = `$${grandTotal.toFixed(2)}`;
+        }
+
         function toggleWalletAddress() {
             var method = document.getElementById('payment_method').value;
             var addrEl = document.getElementById('wallet_address');
@@ -434,19 +452,51 @@
             }
         }
 
-        // 提交订单至 EmailJS
-        function submitDirectCryptoOrder() {
+        // 转换上传图片为 Base64
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    resolve("No screenshot uploaded");
+                    return;
+                }
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function submitDirectCryptoOrder() {
             let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
             if (cart.length === 0) {
                 alert("Your cart is empty!");
                 return;
             }
 
+            var btn = document.getElementById('submit-btn-text');
+            btn.disabled = true;
+            btn.textContent = "Submitting Order...";
+
             var orderSummary = cart.map(function(item) {
-                return `${item.name} (${item.spec || 'Standard'}) x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`;
+                var spec = item.spec || item.specification || 'Standard';
+                var p = parseFloat(item.price) || 0;
+                var q = parseInt(item.quantity) || 1;
+                return `${item.name} (${spec}) x ${q} - $${(p * q).toFixed(2)}`;
             }).join("\n");
 
-            var total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+            var shippingFee = parseFloat(document.getElementById('shipping_fee_select').value) || 0;
+            var grandTotal = (currentSubtotal + shippingFee).toFixed(2);
+
+            var proofFileInput = document.getElementById('payment_proof').files[0];
+            var proofBase64 = "No screenshot uploaded";
+
+            if (proofFileInput) {
+                try {
+                    proofBase64 = await getBase64(proofFileInput);
+                } catch (e) {
+                    console.error("Error reading proof image:", e);
+                }
+            }
 
             var templateParams = {
                 customer_name: document.getElementById('cust_name').value.trim(),
@@ -454,33 +504,36 @@
                 customer_phone: document.getElementById('cust_phone').value.trim(),
                 shipping_address: document.getElementById('cust_address').value.trim(),
                 payment_method: document.getElementById('payment_method').value,
+                shipping_fee: shippingFee > 0 ? `$${shippingFee.toFixed(2)}` : "Free Shipping",
                 txid: document.getElementById('txid').value.trim() || "Not provided",
                 order_items: orderSummary,
-                total_price: total
+                total_price: `$${grandTotal}`,
+                payment_proof: proofBase64
             };
 
-            // 使用 service_gmail 作为默认 Service ID 结合 template_g2vs11k 提交
             emailjs.send('service_gmail', 'template_g2vs11k', templateParams)
-                .then(function(response) {
+                .then(function() {
                     alert('Order submitted successfully! We will verify payment and contact you shortly.');
                     localStorage.removeItem('peptides_cart');
-                    loadCart();
+                    location.reload();
                 }, function(error) {
-                    alert('Failed to send order. Please contact us via WhatsApp / Telegram directly.');
+                    alert('Failed to send order. Please try again or contact us on Telegram.');
+                    btn.disabled = false;
+                    btn.textContent = "Complete & Submit Order";
                     console.error('EmailJS Error:', error);
                 });
         }
 
         function updateQty(index, change) {
             let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
-            cart[index].quantity += change;
-            
-            if (cart[index].quantity <= 0) {
-                cart.splice(index, 1);
+            if (cart[index]) {
+                cart[index].quantity = (parseInt(cart[index].quantity) || 1) + change;
+                if (cart[index].quantity <= 0) {
+                    cart.splice(index, 1);
+                }
+                localStorage.setItem('peptides_cart', JSON.stringify(cart));
+                loadCart();
             }
-            
-            localStorage.setItem('peptides_cart', JSON.stringify(cart));
-            loadCart();
         }
         
         function deleteItem(index) {
@@ -490,7 +543,7 @@
             loadCart();
         }
         
-        loadCart();
+        document.addEventListener('DOMContentLoaded', loadCart);
     </script>
 </body>
 </html>
