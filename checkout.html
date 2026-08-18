@@ -1,0 +1,125 @@
+<!-- 引入 EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  (function(){
+      // 替换为你的 EmailJS Public Key
+      emailjs.init("YOUR_PUBLIC_KEY");
+  })();
+</script>
+
+<div class="checkout-container" style="max-width:600px; margin:20px auto; padding:20px; border:1px solid #ddd; border-radius:8px;">
+    <h3>Shipping & Crypto Payment Information</h3>
+    
+    <!-- 客户基本信息 -->
+    <div style="margin-bottom:15px;">
+        <label>Full Name *</label>
+        <input type="text" id="cust_name" style="width:100%; padding:8px; margin-top:5px;" required>
+    </div>
+    
+    <div style="margin-bottom:15px;">
+        <label>Email Address *</label>
+        <input type="email" id="cust_email" style="width:100%; padding:8px; margin-top:5px;" required>
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <label>WhatsApp / Telegram *</label>
+        <input type="text" id="cust_phone" style="width:100%; padding:8px; margin-top:5px;" required>
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <label>Detailed Shipping Address *</label>
+        <textarea id="cust_address" style="width:100%; padding:8px; margin-top:5px;" rows="3" required></textarea>
+    </div>
+
+    <!-- 虚拟货币选择区 -->
+    <div style="margin-bottom:15px;">
+        <label>Select Crypto Payment Method *</label>
+        <select id="payment_method" style="width:100%; padding:8px; margin-top:5px;" onchange="toggleWalletAddress()">
+            <option value="USDT-TRC20">USDT (TRC20 - Tron Network)</option>
+            <option value="USDT-ERC20">USDT (ERC20 - Ethereum Network)</option>
+            <option value="BTC">Bitcoin (BTC)</option>
+        </select>
+    </div>
+
+    <!-- 钱包地址展示框 -->
+    <div id="wallet_box" style="background:#f4f4f4; padding:15px; border-radius:6px; margin-bottom:15px; word-break:break-all;">
+        <strong>Send Payment To:</strong>
+        <p id="wallet_address" style="font-family:monospace; color:#007bff; margin:8px 0; font-weight:bold;">
+            <!-- 默认展示 TRC20 地址 -->
+            YOUR_TRC20_WALLET_ADDRESS_HERE
+        </p>
+        <small style="color:#666;">Please transfer the exact total amount in USD equivalent.</small>
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <label>Transaction ID / Hash (Optional)</label>
+        <input type="text" id="txid" placeholder="Paste TxID after payment" style="width:100%; padding:8px; margin-top:5px;">
+    </div>
+
+    <button onclick="submitCryptoOrder()" style="width:100%; padding:12px; background:#25D366; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+        Submit Order & Send Details
+    </button>
+</div>
+
+<script>
+// 切换币种展示对应的钱包地址
+function toggleWalletAddress() {
+    var method = document.getElementById('payment_method').value;
+    var addrEl = document.getElementById('wallet_address');
+    
+    if (method === 'USDT-TRC20') {
+        addrEl.textContent = "YOUR_TRC20_WALLET_ADDRESS_HERE";
+    } else if (method === 'USDT-ERC20') {
+        addrEl.textContent = "YOUR_ERC20_WALLET_ADDRESS_HERE";
+    } else if (method === 'BTC') {
+        addrEl.textContent = "YOUR_BTC_WALLET_ADDRESS_HERE";
+    }
+}
+
+// 提交订单并发送邮件
+function submitCryptoOrder() {
+    var name = document.getElementById('cust_name').value.trim();
+    var email = document.getElementById('cust_email').value.trim();
+    var phone = document.getElementById('cust_phone').value.trim();
+    var address = document.getElementById('cust_address').value.trim();
+
+    if (!name || !email || !phone || !address) {
+        alert("Please fill in all required shipping fields!");
+        return;
+    }
+
+    var cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    var orderSummary = cart.map(function(item) {
+        return `${item.name} (${item.variant || 'Standard'}) x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`;
+    }).join("\n");
+
+    var total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+
+    var templateParams = {
+        customer_name: name,
+        customer_email: email,
+        customer_phone: phone,
+        shipping_address: address,
+        payment_method: document.getElementById('payment_method').value,
+        txid: document.getElementById('txid').value || "Not provided",
+        order_items: orderSummary,
+        total_price: total
+    };
+
+    // 替换为你的 Service ID 和 Template ID
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        .then(function(response) {
+            alert('Order submitted successfully! We will verify your crypto payment and contact you shortly.');
+            localStorage.removeItem('peptides_cart');
+            window.location.href = "thank-you.html";
+        }, function(error) {
+            alert('Failed to send order. Please contact us via WhatsApp or Telegram directly.');
+            console.log('EmailJS Error:', error);
+        });
+}
+</script>
