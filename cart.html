@@ -3,609 +3,502 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google" content="notranslate">
-    <title>Shopping Cart & Checkout | Peptides Factory</title>
-    
-    <link rel="canonical" href="https://peptidefactor.github.io/pepper/cart.html" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script>
-        (function(){
-            emailjs.init("M3-npsUuG0wBf8Ltd");
-        })();
-    </script>
-
+    <title>Shopping Cart & Checkout - PeptidesFactoryCN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #0a2540;
-            --accent-color: #00d4b2;
-            --text-dark: #333;
-            --bg-light: #f8f9fa;
+            --primary-color: #0f172a;
+            --accent-color: #25d366;
+            --accent-hover: #1da851;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #334155;
+            --text-muted: #64748b;
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0;
-            color: var(--text-dark);
-            background-color: #fff;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 5%; 
-            border-bottom: 1px solid #eee;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            background: #fff;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo-img {
-            height: 60px; 
-            width: auto;
-            object-fit: contain;
-        }
-        nav a {
-            margin: 0 15px;
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            transition: 0.3s;
-        }
-        nav a:hover { color: var(--accent-color); }
-
-        .cart-container { 
-            max-width: 1200px; 
-            margin: 40px auto; 
-            padding: 0 20px; 
-            min-height: 400px;
-        }
-        .cart-title { 
-            color: var(--primary-color); 
-            font-size: 28px; 
-            margin-bottom: 30px; 
-            border-bottom: 2px solid #eee; 
-            padding-bottom: 10px; 
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--border-color);
         }
 
-        /* 布局结构 */
-        .cart-layout {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            align-items: flex-start;
+        header h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+            font-weight: 700;
         }
-        .cart-left-table {
-            flex: 1;
-            min-width: 320px;
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 5px;
         }
-        .checkout-right-form {
-            width: 420px;
-            min-width: 320px;
-            background: var(--bg-light);
-            border: 1px solid #e0e0e0;
+
+        .cart-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .cart-grid {
+                grid-template-columns: 1.2fr 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 25px;
-            box-sizing: border-box;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .cart-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 20px; 
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
         }
-        .cart-table th { 
-            background-color: var(--primary-color); 
-            color: white; 
-            padding: 12px 15px; 
-            text-align: left; 
+
+        /* Cart Items Table */
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .cart-table th {
+            text-align: left;
+            padding: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+        }
+
+        .cart-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
             font-size: 14px;
         }
-        .cart-table td { 
-            padding: 12px 15px; 
-            border-bottom: 1px solid #eee; 
-            vertical-align: middle; 
-        }
-        
-        .item-image { 
-            width: 50px; 
-            height: 50px; 
-            object-fit: contain; 
-            background: #f0f0f0; 
-            border-radius: 6px; 
-            padding: 4px; 
-        }
-        .item-details { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-        }
-        .item-name { 
-            font-weight: bold; 
-            color: var(--primary-color); 
-            font-size: 15px; 
-        }
-        .item-spec { 
-            color: #666; 
-            font-size: 13px; 
-            margin-top: 3px; 
+
+        .qty-input {
+            width: 50px;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: center;
         }
 
-        .qty-control {
+        .remove-btn {
+            color: #ef4444;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+        }
+
+        .summary-row {
             display: flex;
-            align-items: center;
-        }
-        .qty-btn { 
-            background: #eee; 
-            border: none; 
-            padding: 4px 10px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            border-radius: 4px; 
-            font-weight: bold;
-        }
-        .qty-btn:hover { background: #ddd; }
-        .qty-input { 
-            width: 35px; 
-            text-align: center; 
-            border: 1px solid #ddd; 
-            padding: 4px; 
-            margin: 0 4px; 
-            border-radius: 4px; 
-            font-size: 14px; 
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
         }
 
-        .delete-btn { 
-            background: none; 
-            border: none; 
-            color: #ff4d4d; 
-            cursor: pointer; 
-            font-size: 16px; 
-        }
-        .delete-btn:hover { color: #cc0000; }
-
-        /* 表单与提示 */
-        .shipping-threshold-info {
-            background-color: #e6f7ff;
-            border: 1px solid #91d5ff;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 12px;
-            color: #0050b3;
-            margin-bottom: 10px;
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary-color);
+            border-top: 2px solid var(--border-color);
+            padding-top: 12px;
+            margin-top: 10px;
         }
 
+        /* Form Controls */
         .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             font-size: 13px;
             font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            color: var(--text-main);
         }
-        .form-group input, .form-group textarea, .form-group select {
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            box-sizing: border-box;
-            font-family: inherit;
             font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        .wallet-card {
-            background: #fff;
-            border: 1px dashed var(--accent-color);
-            border-radius: 6px;
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: #3b82f6;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+            margin-top: 15px;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .notice-box {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
             padding: 12px;
-            margin-bottom: 15px;
-            word-break: break-all;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 15px;
         }
 
-        .submit-btn { 
-            background-color: var(--primary-color); 
-            color: white; 
-            width: 100%; 
-            padding: 14px; 
-            border: none; 
-            border-radius: 6px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            margin-top: 10px; 
-        }
-        .submit-btn:hover { 
-            background-color: #00d4b2; 
-            color: #0a2540;
-        }
-
-        .empty-msg { 
-            text-align: center; 
-            padding: 60px 0; 
-        }
-        .empty-msg i { 
-            font-size: 60px; 
-            color: #ccc; 
-            margin-bottom: 20px; 
-        }
-        .empty-msg p { 
-            font-size: 18px; 
-            color: #666; 
-            margin-bottom: 25px; 
-        }
-        .shop-link { 
-            display: inline-block; 
-            background-color: var(--primary-color); 
-            color: white; 
-            padding: 12px 30px; 
-            text-decoration: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
-        }
-
-        footer { 
-            background-color: #0d1117; 
-            color: #9ca3af; 
-            padding: 30px 5%; 
-            font-size: 14px; 
-            text-align: center; 
-            margin-top: 80px; 
+        .empty-cart-msg {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
 
+<div class="container">
     <header>
-        <a href="index.html">
-            <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
-        </a>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="index.html#shop">Shop</a>
-        </nav>
+        <h1>PeptidesFactoryCN Order Checkout</h1>
+        <p>Research Use Only (RUO) Reagents & Laboratory Supplies</p>
     </header>
 
-    <div class="cart-container">
-        <h1 class="cart-title">Your Shopping Cart & Direct Checkout</h1>
-        
-        <div id="cart-wrapper">
-            <div class="cart-layout">
-                <!-- 左栏：商品清单与自动结算 -->
-                <div class="cart-left-table">
-                    <table class="cart-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Total</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cart-rows">
-                            <!-- 动态插入行 -->
-                        </tbody>
-                    </table>
+    <div class="cart-grid">
+        <!-- Left: Cart Items & Order Summary -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-shopping-cart"></i> Your Shopping Cart
+            </div>
+            <div id="cart-content">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items-body">
+                        <!-- Dynamic Cart Items -->
+                    </tbody>
+                </table>
 
-                    <div style="text-align: right; padding: 20px; background: #fdfdfd; border-radius: 8px; border: 1px solid #eee;">
-                        <div id="shipping-notice" class="shipping-threshold-info" style="text-align: right; display: inline-block;">
-                            <!-- 动态提示包邮倒计时 -->
-                        </div>
-                        <p style="margin: 5px 0; color: #666;">Subtotal: <strong style="color: #333;" id="subtotal-val">$0.00</strong></p>
-                        <p style="margin: 5px 0; color: #666;">Stealth Express Shipping: <strong id="shipping-fee-val">$40.00</strong></p>
-                        <h3 style="margin: 10px 0 0 0; color: var(--primary-color);">Total: <span id="total-val">$0.00</span></h3>
-                    </div>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal-val">$0.00</span>
                 </div>
-
-                <!-- 右栏：客户信息与付款截图上传 -->
-                <div class="checkout-right-form">
-                    <h3 style="margin-top:0; color:var(--primary-color); font-size:18px;">Shipping & Crypto Payment</h3>
-                    
-                    <form id="direct-checkout-form" onsubmit="event.preventDefault(); submitDirectCryptoOrder();">
-                        <div class="form-group">
-                            <label>Full Name *</label>
-                            <input type="text" id="cust_name" placeholder="John Doe" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Email Address *</label>
-                            <input type="email" id="cust_email" placeholder="john@example.com" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>WhatsApp / Telegram *</label>
-                            <input type="text" id="cust_phone" placeholder="+1 234 567 8900" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Detailed Shipping Address *</label>
-                            <textarea id="cust_address" rows="3" placeholder="Street address, city, state, zip code, country" required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Crypto Payment Method *</label>
-                            <select id="payment_method" onchange="toggleWalletAddress()">
-                                <option value="USDT-TRC20">USDT (TRC20 - Tron Network)</option>
-                                <option value="USDT-ERC20">USDT (ERC20 - Ethereum Network)</option>
-                                <option value="BTC">Bitcoin (BTC)</option>
-                            </select>
-                        </div>
-
-                        <div class="wallet-card">
-                            <span style="font-size:12px; color:#666;">Send exact total amount to:</span>
-                            <p id="wallet_address" style="font-family:monospace; color:#007bff; font-size:13px; font-weight:bold; margin:6px 0 0 0;">
-                                TB9Cr786LZDYdYNqYHZGExbx4oGYqGMiWj
-                            </p>
-                        </div>
-
-                        <div class="form-group">
-                            <label>TxID / Hash (Optional)</label>
-                            <input type="text" id="txid" placeholder="Paste transaction hash if paid">
-                        </div>
-
-                        <!-- 截图上传 -->
-                        <div class="form-group">
-                            <label>Upload Payment Proof / Screenshot (Optional)</label>
-                            <input type="file" id="payment_proof" accept="image/*" style="padding: 6px; font-size: 13px;">
-                            <span style="font-size: 11px; color: #888;">Upload your transaction screenshot for faster verification.</span>
-                        </div>
-
-                        <button type="submit" class="submit-btn" id="submit-btn-text">
-                            Complete & Submit Order
-                        </button>
-                    </form>
+                <div class="summary-row">
+                    <span>Estimated Shipping</span>
+                    <span id="shipping-val">$0.00</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Grand Total</span>
+                    <span id="grand-total-val">$0.00</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <footer>
-        <div>Copyright © 2026 Peptides Factory. All Rights Reserved.</div>
-    </footer>
+        <!-- Right: Shipping & Order Details Form -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-shipping-fast"></i> Shipping & Order Details
+            </div>
+            <form id="checkout-form" onsubmit="event.preventDefault(); submitDirectCryptoOrder();">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" required placeholder="John Doe">
+                </div>
 
-    <script>
-        let currentSubtotal = 0;
-        let calculatedShipping = 40;
-        const MY_WHATSAPP_NUMBER = "85252638529"; // 您的 WhatsApp 接收号码
-
-        function loadCart() {
-            let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
-            const wrapper = document.getElementById('cart-wrapper');
-            const tbody = document.getElementById('cart-rows');
-            
-            if (!cart || cart.length === 0) {
-                wrapper.innerHTML = `
-                    <div class="empty-msg">
-                        <i class="fas fa-shopping-basket"></i>
-                        <p>Your shopping cart is empty.</p>
-                        <a href="index.html#shop" class="shop-link">Return to Shop</a>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" required placeholder="john@example.com">
                     </div>
-                `;
-                return;
-            }
-            
-            currentSubtotal = 0;
-            let tableRows = '';
-            
-            cart.forEach((item, index) => {
-                let price = parseFloat(item.price) || 0;
-                let quantity = parseInt(item.quantity) || 1;
-                let itemTotal = price * quantity;
-                currentSubtotal += itemTotal;
-                
-                let specText = item.spec || item.specification || 'Standard';
-                let imgSrc = item.image || item.img || 'placeholder.png';
+                    <div class="form-group">
+                        <label for="phone">Phone / WhatsApp *</label>
+                        <input type="tel" id="phone" required placeholder="+1 234 567 8900">
+                    </div>
+                </div>
 
-                tableRows += `
-                    <tr>
-                        <td>
-                            <div class="item-details">
-                                <img src="${imgSrc}" alt="${item.name}" class="item-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\' viewBox=\'0 0 50 50\'><rect width=\'50\' height=\'50\' fill=\'%23eee\'/></svg>'">
-                                <div>
-                                    <div class="item-name">${item.name}</div>
-                                    <div class="item-spec">Spec: ${specText}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>$${price.toFixed(2)}</td>
-                        <td>
-                            <div class="qty-control">
-                                <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
-                                <input type="text" class="qty-input" value="${quantity}" readonly>
-                                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
-                            </div>
-                        </td>
-                        <td>$${itemTotal.toFixed(2)}</td>
-                        <td>
-                            <button class="delete-btn" onclick="deleteItem(${index})">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
+                <div class="form-group">
+                    <label for="country">Country / Region *</label>
+                    <select id="country" required onchange="updateShippingCost()">
+                        <option value="">Select Country...</option>
+                        <option value="United States">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="France">France</option>
+                        <option value="Other">Other International Destination</option>
+                    </select>
+                </div>
 
-            tbody.innerHTML = tableRows;
-            document.getElementById('subtotal-val').textContent = `$${currentSubtotal.toFixed(2)}`;
-            calculateGrandTotal();
-        }
+                <div class="form-group">
+                    <label for="address">Shipping Address *</label>
+                    <textarea id="address" rows="2" required placeholder="Street address, apartment, suite, etc."></textarea>
+                </div>
 
-        /* 梯度运费逻辑：满 $300 免运费，否则 $40 */
-        function calculateGrandTotal() {
-            const noticeEl = document.getElementById('shipping-notice');
-            const shippingFeeEl = document.getElementById('shipping-fee-val');
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="zipCode">Postal / Zip Code *</label>
+                        <input type="text" id="zipCode" required>
+                    </div>
+                </div>
 
-            if (currentSubtotal >= 300) {
-                calculatedShipping = 0;
-                shippingFeeEl.textContent = 'FREE';
-                shippingFeeEl.style.color = '#25D366';
-                noticeEl.innerHTML = '<i class="fas fa-check-circle"></i> Congratulations! You qualified for <strong>Free Stealth Shipping</strong>.';
-                noticeEl.style.backgroundColor = '#e6ffed';
-                noticeEl.style.borderColor = '#b7eb8f';
-                noticeEl.style.color = '#135200';
-            } else {
-                calculatedShipping = 40;
-                let needed = (300 - currentSubtotal).toFixed(2);
-                shippingFeeEl.textContent = '$40.00';
-                shippingFeeEl.style.color = '#333';
-                noticeEl.innerHTML = `<i class="fas fa-truck"></i> Add <strong>$${needed}</strong> more to qualify for <strong>Free Shipping</strong>!`;
-                noticeEl.style.backgroundColor = '#e6f7ff';
-                noticeEl.style.borderColor = '#91d5ff';
-                noticeEl.style.color = '#0050b3';
-            }
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Preference *</label>
+                    <select id="paymentMethod" required>
+                        <option value="USDT (TRC20)">USDT (TRC20)</option>
+                        <option value="USDT (ERC20)">USDT (ERC20)</option>
+                        <option value="Bitcoin (BTC)">Bitcoin (BTC)</option>
+                        <option value="Bank Transfer / Wire">Bank Transfer / Wire</option>
+                    </select>
+                </div>
 
-            const grandTotal = currentSubtotal + calculatedShipping;
-            document.getElementById('total-val').textContent = `$${grandTotal.toFixed(2)}`;
-        }
+                <div class="form-group">
+                    <label for="txid">Transaction Hash / TxID (Optional)</label>
+                    <input type="text" id="txid" placeholder="Paste TxID if already paid, or leave blank">
+                </div>
 
-        function toggleWalletAddress() {
-            var method = document.getElementById('payment_method').value;
-            var addrEl = document.getElementById('wallet_address');
-            
-            if (method === 'USDT-TRC20') {
-                addrEl.textContent = "TB9Cr786LZDYdYNqYHZGExbx4oGYqGMiWj";
-            } else if (method === 'USDT-ERC20') {
-                addrEl.textContent = "0xFC8e55dc3C29e2A5895dFC96A9B0703684518574";
-            } else if (method === 'BTC') {
-                addrEl.textContent = "bc1pqcvdkrk3xre984068cr79ekxm7g0trf9cnqasf3jkp8k4ar47x8q9hc3zg";
-            }
-        }
+                <div class="form-group">
+                    <label for="notes">Special Instructions / Order Notes</label>
+                    <textarea id="notes" rows="2" placeholder="Custom packaging requirements, stealth requests, etc."></textarea>
+                </div>
 
-        function getBase64(file) {
-            return new Promise((resolve, reject) => {
-                if (!file) {
-                    resolve("No screenshot uploaded");
-                    return;
-                }
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
+                <button type="submit" class="submit-btn" id="submit-btn-text">
+                    <i class="fab fa-whatsapp"></i> Submit Order via WhatsApp
+                </button>
 
-        // 拼接 WhatsApp 备用备选消息并打开对话框
-        function sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText) {
-            let name = document.getElementById('cust_name').value.trim();
-            let email = document.getElementById('cust_email').value.trim();
-            let phone = document.getElementById('cust_phone').value.trim();
-            let address = document.getElementById('cust_address').value.trim();
-            let payment = document.getElementById('payment_method').value;
-            let txid = document.getElementById('txid').value.trim() || "Not provided";
+                <div class="notice-box">
+                    <i class="fas fa-info-circle"></i> After clicking submit, WhatsApp will open with your order summary pre-filled. You can attach payment confirmation or receipt directly in the chat.
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-            let itemsText = cart.map(item => {
-                let spec = item.spec || item.specification || 'Standard';
-                let p = parseFloat(item.price) || 0;
-                let q = parseInt(item.quantity) || 1;
-                return `• ${item.name} (${spec}) x${q} - $${(p * q).toFixed(2)}`;
-            }).join("\n");
+<script>
+    // ⚠️ 请在此处修改为您的真实 WhatsApp 号码（国家代码 + 号码，不带 + 号或空格）
+    const WHATSAPP_NUMBER = "15813887304";
 
-            let waMessage = `🛒 *NEW ORDER DIRECT SUBMISSION*\n\n` +
-                `*Customer:* ${name}\n` +
-                `*Email:* ${email}\n` +
-                `*Phone/TG:* ${phone}\n` +
-                `*Address:* ${address}\n\n` +
-                `*Order Items:*\n${itemsText}\n\n` +
-                `*Shipping Fee:* ${shippingFeeText}\n` +
-                `*Total Amount:* $${grandTotal}\n` +
-                `*Payment Method:* ${payment}\n` +
-                `*TxID/Hash:* ${txid}\n\n` +
-                `_(Please confirm receipt of this order)_`;
+    let currentSubtotal = 0;
+    let calculatedShipping = 0;
 
-            let encodedMsg = encodeURIComponent(waMessage);
-            let waUrl = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodedMsg}`;
-            
-            // 打开 WhatsApp
-            window.open(waUrl, '_blank');
-        }
-
-        async function submitDirectCryptoOrder() {
-            let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
-            if (cart.length === 0) {
-                alert("Your cart is empty!");
-                return;
-            }
-
-            var btn = document.getElementById('submit-btn-text');
-            btn.disabled = true;
-            btn.textContent = "Submitting Order...";
-
-            var orderSummary = cart.map(function(item) {
-                var spec = item.spec || item.specification || 'Standard';
-                var p = parseFloat(item.price) || 0;
-                var q = parseInt(item.quantity) || 1;
-                return `${item.name} (${spec}) x ${q} - $${(p * q).toFixed(2)}`;
-            }).join("\n");
-
-            var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
-            var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}` : "Free Shipping";
-
-            var proofFileInput = document.getElementById('payment_proof').files[0];
-            var proofBase64 = "No screenshot uploaded";
-
-            if (proofFileInput) {
-                try {
-                    proofBase64 = await getBase64(proofFileInput);
-                } catch (e) {
-                    console.error("Error reading proof image:", e);
-                }
-            }
-
-            var templateParams = {
-                customer_name: document.getElementById('cust_name').value.trim(),
-                customer_email: document.getElementById('cust_email').value.trim(),
-                customer_phone: document.getElementById('cust_phone').value.trim(),
-                shipping_address: document.getElementById('cust_address').value.trim(),
-                payment_method: document.getElementById('payment_method').value,
-                shipping_fee: shippingFeeText,
-                txid: document.getElementById('txid').value.trim() || "Not provided",
-                order_items: orderSummary,
-                total_price: `$${grandTotal}`,
-                payment_proof: proofBase64
-            };
-
-            // 发送 EmailJS，失败时自动备用跳转 WhatsApp
-            emailjs.send('service_gmail', 'template_g2vs11k', templateParams)
-                .then(function() {
-                    alert('Order submitted successfully! We will verify payment and contact you shortly.');
-                    localStorage.removeItem('peptides_cart');
-                    location.reload();
-                }, function(error) {
-                    console.error('EmailJS Failed, switching to WhatsApp backup:', error);
-                    alert('Direct Email submission failed or network was busy. Opening WhatsApp now to send your order details directly!');
-                    sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText);
-                    btn.disabled = false;
-                    btn.textContent = "Complete & Submit Order";
-                });
-        }
-
-        function updateQty(index, change) {
-            let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
-            if (cart[index]) {
-                cart[index].quantity = (parseInt(cart[index].quantity) || 1) + change;
-                if (cart[index].quantity <= 0) {
-                    cart.splice(index, 1);
-                }
-                localStorage.setItem('peptides_cart', JSON.stringify(cart));
-                loadCart();
-            }
-        }
-        
-        function deleteItem(index) {
-            let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
-            cart.splice(index, 1);
+    // Load Cart Data on Page Initialization
+    document.addEventListener("DOMContentLoaded", function () {
+        let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
+        if (cart.length === 0) {
+            cart = [
+                { id: "P001", name: "Tirzepatide 10mg", price: 35.00, qty: 2 },
+                { id: "P002", name: "Semaglutide 5mg", price: 28.00, qty: 1 }
+            ];
             localStorage.setItem('peptides_cart', JSON.stringify(cart));
-            loadCart();
         }
+        renderCart();
+    });
+
+    function renderCart() {
+        let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
+        const tbody = document.getElementById('cart-items-body');
+        tbody.innerHTML = '';
+
+        if (cart.length === 0) {
+            document.getElementById('cart-content').innerHTML = '<div class="empty-cart-msg">Your shopping cart is empty.</div>';
+            return;
+        }
+
+        currentSubtotal = 0;
+
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.qty;
+            currentSubtotal += itemTotal;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${item.name}</strong></td>
+                <td>$${item.price.toFixed(2)}</td>
+                <td>
+                    <input type="number" class="qty-input" value="${item.qty}" min="1" onchange="updateQuantity(${index}, this.value)">
+                </td>
+                <td>$${itemTotal.toFixed(2)}</td>
+                <td><button class="remove-btn" onclick="removeItem(${index})"><i class="fas fa-trash-alt"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        updateShippingCost();
+    }
+
+    function updateQuantity(index, newQty) {
+        let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
+        const qty = parseInt(newQty);
+        if (qty > 0) {
+            cart[index].qty = qty;
+            localStorage.setItem('peptides_cart', JSON.stringify(cart));
+            renderCart();
+        }
+    }
+
+    function removeItem(index) {
+        let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
+        cart.splice(index, 1);
+        localStorage.setItem('peptides_cart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    function updateShippingCost() {
+        const country = document.getElementById('country').value;
+        if (!country) {
+            calculatedShipping = 0;
+        } else if (currentSubtotal >= 300) {
+            calculatedShipping = 0; // Free shipping over $300
+        } else {
+            calculatedShipping = 25.00; // Flat express shipping rate
+        }
+
+        document.getElementById('subtotal-val').innerText = `$${currentSubtotal.toFixed(2)}`;
+        document.getElementById('shipping-val').innerText = calculatedShipping === 0 ? "Free Shipping" : `$${calculatedShipping.toFixed(2)}`;
         
-        document.addEventListener('DOMContentLoaded', loadCart);
-    </script>
+        const grandTotal = currentSubtotal + calculatedShipping;
+        document.getElementById('grand-total-val').innerText = `$${grandTotal.toFixed(2)}`;
+    }
+
+    // WhatsApp Backup Order Sender
+    function sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText) {
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const country = document.getElementById('country').value;
+        const address = document.getElementById('address').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const zipCode = document.getElementById('zipCode').value.trim();
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const txid = document.getElementById('txid').value.trim();
+        const notes = document.getElementById('notes').value.trim();
+
+        let itemsText = "";
+        cart.forEach(item => {
+            itemsText += `• ${item.name} x ${item.qty} ($${(item.price * item.qty).toFixed(2)})\n`;
+        });
+
+        let message = `🛒 *NEW ORDER - PeptidesFactoryCN*\n`;
+        message += `------------------------------------\n`;
+        message += `*Customer Info:*\n`;
+        message += `• Name: ${fullName}\n`;
+        message += `• Email: ${email}\n`;
+        message += `• Phone: ${phone}\n\n`;
+        message += `*Shipping Address:*\n`;
+        message += `${address}\n${city}, ${zipCode}, ${country}\n\n`;
+        message += `*Order Items:*\n${itemsText}\n`;
+        message += `• Subtotal: $${currentSubtotal.toFixed(2)}\n`;
+        message += `• Shipping: ${shippingFeeText}\n`;
+        message += `• *Grand Total: $${grandTotal}*\n\n`;
+        message += `*Payment Method:* ${paymentMethod}\n`;
+        if (txid) {
+            message += `*TxID / Hash:* ${txid}\n`;
+        }
+        if (notes) {
+            message += `*Notes:* ${notes}\n`;
+        }
+        message += `------------------------------------\n`;
+        message += `Please confirm order details and provide shipping tracking once dispatched.`;
+
+        const encodedMessage = encodeURIComponent(message);
+        const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+        window.open(waUrl, '_blank');
+    }
+
+    // Direct WhatsApp Submission Handler
+    function submitDirectCryptoOrder() {
+        let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
+        if (cart.length === 0) {
+            alert("Your cart is empty!");
+            return;
+        }
+
+        var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
+        var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}` : "Free Shipping";
+
+        sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText);
+
+        alert('Redirecting to WhatsApp to send your order! Please remember to attach your payment screenshot in the chat.');
+        localStorage.removeItem('peptides_cart');
+        location.reload();
+    }
+</script>
+
 </body>
 </html>
