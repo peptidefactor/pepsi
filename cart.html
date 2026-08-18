@@ -71,7 +71,7 @@
             padding-bottom: 10px; 
         }
 
-        /* 左右双栏布局 */
+        /* 布局结构 */
         .cart-layout {
             display: flex;
             gap: 30px;
@@ -168,7 +168,17 @@
         }
         .delete-btn:hover { color: #cc0000; }
 
-        /* 表单样式 */
+        /* 表单与提示 */
+        .shipping-threshold-info {
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #0050b3;
+            margin-bottom: 10px;
+        }
+
         .form-group {
             margin-bottom: 14px;
         }
@@ -267,7 +277,7 @@
         
         <div id="cart-wrapper">
             <div class="cart-layout">
-                <!-- 左栏：购物车明细与费用结算 -->
+                <!-- 左栏：商品清单与自动结算 -->
                 <div class="cart-left-table">
                     <table class="cart-table">
                         <thead>
@@ -285,24 +295,18 @@
                     </table>
 
                     <div style="text-align: right; padding: 20px; background: #fdfdfd; border-radius: 8px; border: 1px solid #eee;">
-                        <p style="margin: 5px 0; color: #666;">Subtotal: <strong style="color: #333;" id="subtotal-val">$0.00</strong></p>
-                        
-                        <div style="margin: 12px 0; display: inline-block; text-align: right;">
-                            <label style="font-size: 13px; font-weight: 600; color: #666; margin-right: 8px;">Shipping Method:</label>
-                            <select id="shipping_fee_select" onchange="calculateGrandTotal()" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
-                                <option value="50">Stealth Express Shipping ($50.00)</option>
-                                <option value="0">Standard Free Shipping ($0.00)</option>
-                            </select>
+                        <div id="shipping-notice" class="shipping-threshold-info" style="text-align: right; display: inline-block;">
+                            <!-- 动态提示包邮倒计时 -->
                         </div>
-
-                        <p style="margin: 5px 0; color: #666;">Shipping Fee: <strong style="color: #25D366;" id="shipping-fee-val">$50.00</strong></p>
+                        <p style="margin: 5px 0; color: #666;">Subtotal: <strong style="color: #333;" id="subtotal-val">$0.00</strong></p>
+                        <p style="margin: 5px 0; color: #666;">Stealth Express Shipping: <strong id="shipping-fee-val">$40.00</strong></p>
                         <h3 style="margin: 10px 0 0 0; color: var(--primary-color);">Total: <span id="total-val">$0.00</span></h3>
                     </div>
                 </div>
 
                 <!-- 右栏：客户信息与付款截图上传 -->
                 <div class="checkout-right-form">
-                    <h3 style="margin-top:0; color:var(--primary-color); font-size:18px;">Shipping & Payment Info</h3>
+                    <h3 style="margin-top:0; color:var(--primary-color); font-size:18px;">Shipping & Crypto Payment</h3>
                     
                     <form id="direct-checkout-form" onsubmit="event.preventDefault(); submitDirectCryptoOrder();">
                         <div class="form-group">
@@ -346,7 +350,7 @@
                             <input type="text" id="txid" placeholder="Paste transaction hash if paid">
                         </div>
 
-                        <!-- 付款截图上传功能 -->
+                        <!-- 截图上传 -->
                         <div class="form-group">
                             <label>Upload Payment Proof / Screenshot (Optional)</label>
                             <input type="file" id="payment_proof" accept="image/*" style="padding: 6px; font-size: 13px;">
@@ -368,6 +372,7 @@
 
     <script>
         let currentSubtotal = 0;
+        let calculatedShipping = 40;
 
         function loadCart() {
             let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
@@ -431,11 +436,31 @@
             calculateGrandTotal();
         }
 
+        /* 梯度运费逻辑：满 $300 免运费，否则 $40 */
         function calculateGrandTotal() {
-            const shippingFee = parseFloat(document.getElementById('shipping_fee_select').value) || 0;
-            const grandTotal = currentSubtotal + shippingFee;
+            const noticeEl = document.getElementById('shipping-notice');
+            const shippingFeeEl = document.getElementById('shipping-fee-val');
 
-            document.getElementById('shipping-fee-val').textContent = shippingFee > 0 ? `$${shippingFee.toFixed(2)}` : 'Free Shipping';
+            if (currentSubtotal >= 300) {
+                calculatedShipping = 0;
+                shippingFeeEl.textContent = 'FREE';
+                shippingFeeEl.style.color = '#25D366';
+                noticeEl.innerHTML = '<i class="fas fa-check-circle"></i> Congratulations! You qualified for <strong>Free Stealth Shipping</strong>.';
+                noticeEl.style.backgroundColor = '#e6ffed';
+                noticeEl.style.borderColor = '#b7eb8f';
+                noticeEl.style.color = '#135200';
+            } else {
+                calculatedShipping = 40;
+                let needed = (300 - currentSubtotal).toFixed(2);
+                shippingFeeEl.textContent = '$40.00';
+                shippingFeeEl.style.color = '#333';
+                noticeEl.innerHTML = `<i class="fas fa-truck"></i> Add <strong>$${needed}</strong> more to qualify for <strong>Free Shipping</strong>!`;
+                noticeEl.style.backgroundColor = '#e6f7ff';
+                noticeEl.style.borderColor = '#91d5ff';
+                noticeEl.style.color = '#0050b3';
+            }
+
+            const grandTotal = currentSubtotal + calculatedShipping;
             document.getElementById('total-val').textContent = `$${grandTotal.toFixed(2)}`;
         }
 
@@ -452,7 +477,6 @@
             }
         }
 
-        // 转换上传图片为 Base64
         function getBase64(file) {
             return new Promise((resolve, reject) => {
                 if (!file) {
@@ -484,8 +508,7 @@
                 return `${item.name} (${spec}) x ${q} - $${(p * q).toFixed(2)}`;
             }).join("\n");
 
-            var shippingFee = parseFloat(document.getElementById('shipping_fee_select').value) || 0;
-            var grandTotal = (currentSubtotal + shippingFee).toFixed(2);
+            var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
 
             var proofFileInput = document.getElementById('payment_proof').files[0];
             var proofBase64 = "No screenshot uploaded";
@@ -504,7 +527,7 @@
                 customer_phone: document.getElementById('cust_phone').value.trim(),
                 shipping_address: document.getElementById('cust_address').value.trim(),
                 payment_method: document.getElementById('payment_method').value,
-                shipping_fee: shippingFee > 0 ? `$${shippingFee.toFixed(2)}` : "Free Shipping",
+                shipping_fee: calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}` : "Free Shipping",
                 txid: document.getElementById('txid').value.trim() || "Not provided",
                 order_items: orderSummary,
                 total_price: `$${grandTotal}`,
