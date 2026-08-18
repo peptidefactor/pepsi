@@ -94,7 +94,6 @@
             gap: 10px;
         }
 
-        /* Cart Items Table */
         .cart-table, .order-table {
             width: 100%;
             border-collapse: collapse;
@@ -148,7 +147,6 @@
             margin-top: 10px;
         }
 
-        /* Form Controls */
         .form-group {
             margin-bottom: 15px;
         }
@@ -345,7 +343,6 @@
                         <option value="USDT (TRC20)">USDT (TRC20)</option>
                         <option value="USDT (ERC20)">USDT (ERC20)</option>
                         <option value="Bitcoin (BTC)">Bitcoin (BTC)</option>
-                        <option value="Bank Transfer / Wire">Bank Transfer / Wire (银行电汇)</option>
                     </select>
                 </div>
 
@@ -355,8 +352,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="notes">特殊说明 / 订单备注</label>
-                    <textarea id="notes" rows="2" placeholder="定制包装要求、隐蔽包装要求等。"></textarea>
+                    <label for="notes">付款截图 / 凭证说明</label>
+                    <textarea id="notes" rows="2" placeholder="如已截图，可在发送 WhatsApp 时粘贴图片或提供付款说明。"></textarea>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submit-btn-text">
@@ -394,7 +391,6 @@
     let currentSubtotal = 0;
     let calculatedShipping = 0;
 
-    // 页面初始化时加载购物车
     document.addEventListener("DOMContentLoaded", function () {
         renderCart();
         renderOrderHistory();
@@ -457,9 +453,9 @@
         if (cart.length === 0) {
             calculatedShipping = 0;
         } else if (currentSubtotal >= 300) {
-            calculatedShipping = 0; // 满300美元免运费
+            calculatedShipping = 0; 
         } else {
-            calculatedShipping = 40.00; // 300美元以下运费40美元
+            calculatedShipping = 40.00; 
         }
 
         document.getElementById('subtotal-val').innerText = `$${currentSubtotal.toFixed(2)}美元`;
@@ -469,12 +465,10 @@
         document.getElementById('grand-total-val').innerText = `$${grandTotal.toFixed(2)}美元`;
     }
 
-    // 切换管理员历史订单查看（加个简单密码）
     function toggleAdminView() {
         const container = document.getElementById('admin-orders-container');
         if (container.style.display === 'none') {
             const pwd = prompt("请输入管理员查看密码 (默认直接点确定或输入密码):");
-            // 你可以自行修改密码逻辑，这里默认直接允许查看
             container.style.display = 'block';
             renderOrderHistory();
         } else {
@@ -482,7 +476,6 @@
         }
     }
 
-    // 渲染历史订单列表
     function renderOrderHistory() {
         let orders = JSON.parse(localStorage.getItem('peptides_order_history')) || [];
         const contentDiv = document.getElementById('order-list-content');
@@ -505,14 +498,13 @@
                     <div><strong>地址:</strong> ${order.address}, ${order.city}, ${order.zipCode}, ${order.country}</div>
                     <div><strong>购买商品:</strong> ${itemsStr}</div>
                     <div><strong>支付方式:</strong> ${order.paymentMethod} ${order.txid ? '| <strong>TxID:</strong> ' + order.txid : ''}</div>
-                    ${order.notes ? '<div><strong>备注:</strong> ' + order.notes + '</div>' : ''}
+                    ${order.notes ? '<div><strong>付款截图说明:</strong> ' + order.notes + '</div>' : ''}
                 </div>
             `;
         });
         contentDiv.innerHTML = html;
     }
 
-    // 清空历史记录
     function clearOrderHistory() {
         if (confirm("确定要清空所有的历史订单备份记录吗？")) {
             localStorage.removeItem('peptides_order_history');
@@ -520,7 +512,6 @@
         }
     }
 
-    // 提交订单：同时写入历史记录并拉起 WhatsApp
     function submitDirectCryptoOrder() {
         let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
         if (cart.length === 0) {
@@ -542,7 +533,6 @@
         var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
         var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}美元` : "免运费";
 
-        // 1. 保存到本地历史订单 (localStorage)
         const newOrder = {
             time: new Date().toLocaleString(),
             fullName, email, phone, country, address, city, zipCode,
@@ -557,7 +547,6 @@
         orderHistory.push(newOrder);
         localStorage.setItem('peptides_order_history', JSON.stringify(orderHistory));
 
-        // 2. 拼接 WhatsApp 消息并跳转
         let itemsText = "";
         cart.forEach(item => {
             itemsText += `• ${item.name} x ${item.qty} ($${(item.price * item.qty).toFixed(2)}美元)\n`;
@@ -580,7 +569,7 @@
             message += `*TxID / Hash:* ${txid}\n`;
         }
         if (notes) {
-            message += `*Notes:* ${notes}\n`;
+            message += `*Payment Note / Screenshot Info:* ${notes}\n`;
         }
         message += `------------------------------------\n`;
         message += `Please confirm order details and provide shipping tracking once dispatched.`;
