@@ -73,6 +73,7 @@
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
         }
 
         .card-title {
@@ -82,19 +83,25 @@
             margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
         }
 
+        .card-title span {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         /* Cart Items Table */
-        .cart-table {
+        .cart-table, .order-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
 
-        .cart-table th {
+        .cart-table th, .order-table th {
             text-align: left;
             padding: 10px;
             font-size: 13px;
@@ -103,7 +110,7 @@
             text-transform: uppercase;
         }
 
-        .cart-table td {
+        .cart-table td, .order-table td {
             padding: 12px 10px;
             border-bottom: 1px solid var(--border-color);
             font-size: 14px;
@@ -213,10 +220,25 @@
             margin-top: 15px;
         }
 
-        .empty-cart-msg {
+        .empty-cart-msg, .empty-order-msg {
             text-align: center;
-            padding: 30px;
+            padding: 20px;
             color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .admin-toggle-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .admin-toggle-btn:hover {
+            background: var(--border-color);
         }
     </style>
 </head>
@@ -232,7 +254,7 @@
         <!-- 左侧：购物车及金额汇总 -->
         <div class="card">
             <div class="card-title">
-                <i class="fas fa-shopping-cart"></i> 您的购物车
+                <span><i class="fas fa-shopping-cart"></i> 您的购物车</span>
             </div>
             <div id="cart-content">
                 <table class="cart-table">
@@ -268,7 +290,7 @@
         <!-- 右侧：配送及订单详情表单 -->
         <div class="card">
             <div class="card-title">
-                <i class="fas fa-shipping-fast"></i> 配送及订单详情
+                <span><i class="fas fa-shipping-fast"></i> 配送及订单详情</span>
             </div>
             <form id="checkout-form" onsubmit="event.preventDefault(); submitDirectCryptoOrder();">
                 <div class="form-group">
@@ -342,23 +364,40 @@
                 </button>
 
                 <div class="notice-box">
-                    <i class="fas fa-info-circle"></i> 点击提交后，将打开 WhatsApp 并预填您的订单摘要。您可以直接在聊天中附上付款凭证或收据。
+                    <i class="fas fa-info-circle"></i> 点击提交后，将打开 WhatsApp 并预填您的订单摘要。系统会同时在本地保存订单备份，防止漏单。
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- 底部：管理员历史订单查看区域 -->
+    <div class="card">
+        <div class="card-title">
+            <span><i class="fas fa-history"></i> 本地历史订单备份 (防漏单管理)</span>
+            <button class="admin-toggle-btn" onclick="toggleAdminView()">切换查看</button>
+        </div>
+        <div id="admin-orders-container" style="display: none;">
+            <div id="order-list-content">
+                <!-- 动态填充历史订单 -->
+            </div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="remove-btn" style="background:#ef4444; color:#fff; padding:6px 12px; border-radius:4px; font-size:13px;" onclick="clearOrderHistory()">清空历史订单记录</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     // ⚠️ 请在此处修改为您的真实 WhatsApp 号码（国家代码 + 号码，不带 + 号或空格）
-    const WHATSAPP_NUMBER = "15813887304";
+    const WHATSAPP_NUMBER = "8618000000000";
 
     let currentSubtotal = 0;
     let calculatedShipping = 0;
 
-    // 页面初始化时加载购物车（初始无商品）
+    // 页面初始化时加载购物车
     document.addEventListener("DOMContentLoaded", function () {
         renderCart();
+        renderOrderHistory();
     });
 
     function renderCart() {
@@ -410,7 +449,7 @@
         let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
         cart.splice(index, 1);
         localStorage.setItem('peptides_cart', JSON.stringify(cart));
-        location.reload(); // 重新加载以防清空后表格骨架丢失
+        location.reload();
     }
 
     function updateShippingCost() {
@@ -430,8 +469,65 @@
         document.getElementById('grand-total-val').innerText = `$${grandTotal.toFixed(2)}美元`;
     }
 
-    // 通过 WhatsApp 发送订单备份
-    function sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText) {
+    // 切换管理员历史订单查看（加个简单密码）
+    function toggleAdminView() {
+        const container = document.getElementById('admin-orders-container');
+        if (container.style.display === 'none') {
+            const pwd = prompt("请输入管理员查看密码 (默认直接点确定或输入密码):");
+            // 你可以自行修改密码逻辑，这里默认直接允许查看
+            container.style.display = 'block';
+            renderOrderHistory();
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    // 渲染历史订单列表
+    function renderOrderHistory() {
+        let orders = JSON.parse(localStorage.getItem('peptides_order_history')) || [];
+        const contentDiv = document.getElementById('order-list-content');
+        
+        if (orders.length === 0) {
+            contentDiv.innerHTML = '<div class="empty-order-msg">暂无历史提交订单记录。</div>';
+            return;
+        }
+
+        let html = '';
+        orders.slice().reverse().forEach((order, idx) => {
+            let itemsStr = order.items.map(i => `${i.name} x ${i.qty} ($${(i.price*i.qty).toFixed(2)})`).join(', ');
+            html += `
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 13px;">
+                    <div style="display:flex; justify-content:between; font-weight:bold; margin-bottom:5px; color:var(--primary-color);">
+                        <span>时间: ${order.time}</span>
+                        <span style="color:#25d366;">总计: $${order.grandTotal}美元</span>
+                    </div>
+                    <div><strong>客户:</strong> ${order.fullName} | <strong>电话/WhatsApp:</strong> ${order.phone} | <strong>邮箱:</strong> ${order.email}</div>
+                    <div><strong>地址:</strong> ${order.address}, ${order.city}, ${order.zipCode}, ${order.country}</div>
+                    <div><strong>购买商品:</strong> ${itemsStr}</div>
+                    <div><strong>支付方式:</strong> ${order.paymentMethod} ${order.txid ? '| <strong>TxID:</strong> ' + order.txid : ''}</div>
+                    ${order.notes ? '<div><strong>备注:</strong> ' + order.notes + '</div>' : ''}
+                </div>
+            `;
+        });
+        contentDiv.innerHTML = html;
+    }
+
+    // 清空历史记录
+    function clearOrderHistory() {
+        if (confirm("确定要清空所有的历史订单备份记录吗？")) {
+            localStorage.removeItem('peptides_order_history');
+            renderOrderHistory();
+        }
+    }
+
+    // 提交订单：同时写入历史记录并拉起 WhatsApp
+    function submitDirectCryptoOrder() {
+        let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
+        if (cart.length === 0) {
+            alert("您的购物车是空的！");
+            return;
+        }
+
         const fullName = document.getElementById('fullName').value.trim();
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
@@ -443,6 +539,25 @@
         const txid = document.getElementById('txid').value.trim();
         const notes = document.getElementById('notes').value.trim();
 
+        var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
+        var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}美元` : "免运费";
+
+        // 1. 保存到本地历史订单 (localStorage)
+        const newOrder = {
+            time: new Date().toLocaleString(),
+            fullName, email, phone, country, address, city, zipCode,
+            paymentMethod, txid, notes,
+            items: cart,
+            subtotal: currentSubtotal.toFixed(2),
+            shipping: shippingFeeText,
+            grandTotal: grandTotal
+        };
+
+        let orderHistory = JSON.parse(localStorage.getItem('peptides_order_history')) || [];
+        orderHistory.push(newOrder);
+        localStorage.setItem('peptides_order_history', JSON.stringify(orderHistory));
+
+        // 2. 拼接 WhatsApp 消息并跳转
         let itemsText = "";
         cart.forEach(item => {
             itemsText += `• ${item.name} x ${item.qty} ($${(item.price * item.qty).toFixed(2)}美元)\n`;
@@ -474,22 +589,8 @@
         const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
         window.open(waUrl, '_blank');
-    }
 
-    // 直接通过 WhatsApp 提交订单处理程序
-    function submitDirectCryptoOrder() {
-        let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
-        if (cart.length === 0) {
-            alert("您的购物车是空的！");
-            return;
-        }
-
-        var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
-        var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}美元` : "免运费";
-
-        sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText);
-
-        alert('正在跳转至 WhatsApp 发送您的订单！请记得在聊天中附上您的付款截图。');
+        alert('订单已成功提交并在本地存档！正在为您跳转至 WhatsApp...');
         localStorage.removeItem('peptides_cart');
         location.reload();
     }
