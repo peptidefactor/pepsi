@@ -1,40 +1,41 @@
-<!-- 引入 EmailJS SDK -->
+<!-- 1. 引入 EmailJS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script>
   (function(){
-      // 替换为你的 EmailJS Public Key
+      // TODO: 请将下面的 YOUR_PUBLIC_KEY 替换为你自己的 Public Key
       emailjs.init("YOUR_PUBLIC_KEY");
   })();
 </script>
 
-<div class="checkout-container" style="max-width:600px; margin:20px auto; padding:20px; border:1px solid #ddd; border-radius:8px;">
-    <h3>Shipping & Crypto Payment Information</h3>
+<!-- 2. 结算与地址填写组件 -->
+<div class="checkout-container" style="max-width:600px; margin:20px auto; padding:20px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+    <h3 style="margin-top:0; color:#0a2540;">Shipping & Crypto Payment Information</h3>
     
     <!-- 客户基本信息 -->
     <div style="margin-bottom:15px;">
-        <label>Full Name *</label>
-        <input type="text" id="cust_name" style="width:100%; padding:8px; margin-top:5px;" required>
+        <label style="font-weight:600;">Full Name *</label>
+        <input type="text" id="cust_name" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;" required>
     </div>
     
     <div style="margin-bottom:15px;">
-        <label>Email Address *</label>
-        <input type="email" id="cust_email" style="width:100%; padding:8px; margin-top:5px;" required>
+        <label style="font-weight:600;">Email Address *</label>
+        <input type="email" id="cust_email" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;" required>
     </div>
 
     <div style="margin-bottom:15px;">
-        <label>WhatsApp / Telegram *</label>
-        <input type="text" id="cust_phone" style="width:100%; padding:8px; margin-top:5px;" required>
+        <label style="font-weight:600;">WhatsApp / Telegram *</label>
+        <input type="text" id="cust_phone" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;" required>
     </div>
 
     <div style="margin-bottom:15px;">
-        <label>Detailed Shipping Address *</label>
-        <textarea id="cust_address" style="width:100%; padding:8px; margin-top:5px;" rows="3" required></textarea>
+        <label style="font-weight:600;">Detailed Shipping Address *</label>
+        <textarea id="cust_address" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;" rows="3" required></textarea>
     </div>
 
     <!-- 虚拟货币选择区 -->
     <div style="margin-bottom:15px;">
-        <label>Select Crypto Payment Method *</label>
-        <select id="payment_method" style="width:100%; padding:8px; margin-top:5px;" onchange="toggleWalletAddress()">
+        <label style="font-weight:600;">Select Crypto Payment Method *</label>
+        <select id="payment_method" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;" onchange="toggleWalletAddress()">
             <option value="USDT-TRC20">USDT (TRC20 - Tron Network)</option>
             <option value="USDT-ERC20">USDT (ERC20 - Ethereum Network)</option>
             <option value="BTC">Bitcoin (BTC)</option>
@@ -42,31 +43,33 @@
     </div>
 
     <!-- 钱包地址展示框 -->
-    <div id="wallet_box" style="background:#f4f4f4; padding:15px; border-radius:6px; margin-bottom:15px; word-break:break-all;">
-        <strong>Send Payment To:</strong>
-        <p id="wallet_address" style="font-family:monospace; color:#007bff; margin:8px 0; font-weight:bold;">
-            <!-- 默认展示 TRC20 地址 -->
+    <div id="wallet_box" style="background:#f8f9fa; padding:15px; border:1px dashed #00d4b2; border-radius:6px; margin-bottom:15px; word-break:break-all;">
+        <strong style="color:#0a2540;">Send Payment To:</strong>
+        <p id="wallet_address" style="font-family:monospace; color:#007bff; margin:8px 0; font-weight:bold; font-size:15px;">
+            <!-- TODO: 替换为你的真实 TRC20 钱包地址 -->
             YOUR_TRC20_WALLET_ADDRESS_HERE
         </p>
         <small style="color:#666;">Please transfer the exact total amount in USD equivalent.</small>
     </div>
 
-    <div style="margin-bottom:15px;">
-        <label>Transaction ID / Hash (Optional)</label>
-        <input type="text" id="txid" placeholder="Paste TxID after payment" style="width:100%; padding:8px; margin-top:5px;">
+    <div style="margin-bottom:20px;">
+        <label style="font-weight:600;">Transaction ID / Hash (Optional)</label>
+        <input type="text" id="txid" placeholder="Paste TxID after payment" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
     </div>
 
-    <button onclick="submitCryptoOrder()" style="width:100%; padding:12px; background:#25D366; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+    <button onclick="submitCryptoOrder()" style="width:100%; padding:14px; background:#25D366; color:white; border:none; border-radius:6px; font-weight:bold; font-size:16px; cursor:pointer; transition:0.3s;">
         Submit Order & Send Details
     </button>
 </div>
 
+<!-- 3. 业务逻辑 JavaScript -->
 <script>
 // 切换币种展示对应的钱包地址
 function toggleWalletAddress() {
     var method = document.getElementById('payment_method').value;
     var addrEl = document.getElementById('wallet_address');
     
+    // TODO: 将下方引号中的地址替换为你真实的收款地址
     if (method === 'USDT-TRC20') {
         addrEl.textContent = "YOUR_TRC20_WALLET_ADDRESS_HERE";
     } else if (method === 'USDT-ERC20') {
@@ -111,12 +114,12 @@ function submitCryptoOrder() {
         total_price: total
     };
 
-    // 替换为你的 Service ID 和 Template ID
-    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+    // TODO: 请将 'YOUR_SERVICE_ID' 替换为你的 EmailJS Service ID
+    emailjs.send('YOUR_SERVICE_ID', 'template_g2vs11k', templateParams)
         .then(function(response) {
             alert('Order submitted successfully! We will verify your crypto payment and contact you shortly.');
-            localStorage.removeItem('peptides_cart');
-            window.location.href = "thank-you.html";
+            localStorage.removeItem('peptides_cart'); // 清空购物车
+            window.location.reload(); // 重新加载或跳转
         }, function(error) {
             alert('Failed to send order. Please contact us via WhatsApp or Telegram directly.');
             console.log('EmailJS Error:', error);
