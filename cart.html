@@ -373,6 +373,7 @@
     <script>
         let currentSubtotal = 0;
         let calculatedShipping = 40;
+        const MY_WHATSAPP_NUMBER = "85252638529"; // 您的 WhatsApp 接收号码
 
         function loadCart() {
             let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
@@ -490,6 +491,41 @@
             });
         }
 
+        // 拼接 WhatsApp 备用备选消息并打开对话框
+        function sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText) {
+            let name = document.getElementById('cust_name').value.trim();
+            let email = document.getElementById('cust_email').value.trim();
+            let phone = document.getElementById('cust_phone').value.trim();
+            let address = document.getElementById('cust_address').value.trim();
+            let payment = document.getElementById('payment_method').value;
+            let txid = document.getElementById('txid').value.trim() || "Not provided";
+
+            let itemsText = cart.map(item => {
+                let spec = item.spec || item.specification || 'Standard';
+                let p = parseFloat(item.price) || 0;
+                let q = parseInt(item.quantity) || 1;
+                return `• ${item.name} (${spec}) x${q} - $${(p * q).toFixed(2)}`;
+            }).join("\n");
+
+            let waMessage = `🛒 *NEW ORDER DIRECT SUBMISSION*\n\n` +
+                `*Customer:* ${name}\n` +
+                `*Email:* ${email}\n` +
+                `*Phone/TG:* ${phone}\n` +
+                `*Address:* ${address}\n\n` +
+                `*Order Items:*\n${itemsText}\n\n` +
+                `*Shipping Fee:* ${shippingFeeText}\n` +
+                `*Total Amount:* $${grandTotal}\n` +
+                `*Payment Method:* ${payment}\n` +
+                `*TxID/Hash:* ${txid}\n\n` +
+                `_(Please confirm receipt of this order)_`;
+
+            let encodedMsg = encodeURIComponent(waMessage);
+            let waUrl = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodedMsg}`;
+            
+            // 打开 WhatsApp
+            window.open(waUrl, '_blank');
+        }
+
         async function submitDirectCryptoOrder() {
             let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
             if (cart.length === 0) {
@@ -509,6 +545,7 @@
             }).join("\n");
 
             var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
+            var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}` : "Free Shipping";
 
             var proofFileInput = document.getElementById('payment_proof').files[0];
             var proofBase64 = "No screenshot uploaded";
@@ -527,23 +564,25 @@
                 customer_phone: document.getElementById('cust_phone').value.trim(),
                 shipping_address: document.getElementById('cust_address').value.trim(),
                 payment_method: document.getElementById('payment_method').value,
-                shipping_fee: calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}` : "Free Shipping",
+                shipping_fee: shippingFeeText,
                 txid: document.getElementById('txid').value.trim() || "Not provided",
                 order_items: orderSummary,
                 total_price: `$${grandTotal}`,
                 payment_proof: proofBase64
             };
 
+            // 发送 EmailJS，失败时自动备用跳转 WhatsApp
             emailjs.send('service_gmail', 'template_g2vs11k', templateParams)
                 .then(function() {
                     alert('Order submitted successfully! We will verify payment and contact you shortly.');
                     localStorage.removeItem('peptides_cart');
                     location.reload();
                 }, function(error) {
-                    alert('Failed to send order. Please try again or contact us on Telegram.');
+                    console.error('EmailJS Failed, switching to WhatsApp backup:', error);
+                    alert('Direct Email submission failed or network was busy. Opening WhatsApp now to send your order details directly!');
+                    sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText);
                     btn.disabled = false;
                     btn.textContent = "Complete & Submit Order";
-                    console.error('EmailJS Error:', error);
                 });
         }
 
