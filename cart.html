@@ -224,125 +224,125 @@
 
 <div class="container">
     <header>
-        <h1>PeptidesFactoryCN Order Checkout</h1>
-        <p>Research Use Only (RUO) Reagents & Laboratory Supplies</p>
+        <h1>PeptidesFactoryCN 订单结算</h1>
+        <p>仅供研究使用 (RUO) 的试剂和实验室用品</p>
     </header>
 
     <div class="cart-grid">
-        <!-- Left: Cart Items & Order Summary -->
+        <!-- 左侧：购物车及金额汇总 -->
         <div class="card">
             <div class="card-title">
-                <i class="fas fa-shopping-cart"></i> Your Shopping Cart
+                <i class="fas fa-shopping-cart"></i> 您的购物车
             </div>
             <div id="cart-content">
                 <table class="cart-table">
                     <thead>
                         <tr>
-                            <th>Item</th>
-                            <th>Price</th>
-                            <th>Qty</th>
-                            <th>Total</th>
+                            <th>物品</th>
+                            <th>价格</th>
+                            <th>数量</th>
+                            <th>全部的</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody id="cart-items-body">
-                        <!-- Dynamic Cart Items -->
+                        <!-- 动态生成购物车商品 -->
                     </tbody>
                 </table>
 
                 <div class="summary-row">
-                    <span>Subtotal</span>
+                    <span>小计</span>
                     <span id="subtotal-val">$0.00</span>
                 </div>
                 <div class="summary-row">
-                    <span>Estimated Shipping</span>
+                    <span>预计运费</span>
                     <span id="shipping-val">$0.00</span>
                 </div>
                 <div class="summary-row total">
-                    <span>Grand Total</span>
+                    <span>累计</span>
                     <span id="grand-total-val">$0.00</span>
                 </div>
             </div>
         </div>
 
-        <!-- Right: Shipping & Order Details Form -->
+        <!-- 右侧：配送及订单详情表单 -->
         <div class="card">
             <div class="card-title">
-                <i class="fas fa-shipping-fast"></i> Shipping & Order Details
+                <i class="fas fa-shipping-fast"></i> 配送及订单详情
             </div>
             <form id="checkout-form" onsubmit="event.preventDefault(); submitDirectCryptoOrder();">
                 <div class="form-group">
-                    <label for="fullName">Full Name *</label>
-                    <input type="text" id="fullName" required placeholder="John Doe">
+                    <label for="fullName">全名*</label>
+                    <input type="text" id="fullName" required placeholder="约翰·多伊">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="email">Email Address *</label>
+                        <label for="email">电子邮件地址 *</label>
                         <input type="email" id="email" required placeholder="john@example.com">
                     </div>
                     <div class="form-group">
-                        <label for="phone">Phone / WhatsApp *</label>
+                        <label for="phone">电话/WhatsApp*</label>
                         <input type="tel" id="phone" required placeholder="+1 234 567 8900">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="country">Country / Region *</label>
+                    <label for="country">国家/地区*</label>
                     <select id="country" required onchange="updateShippingCost()">
-                        <option value="">Select Country...</option>
-                        <option value="United States">United States</option>
-                        <option value="Canada">Canada</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="Australia">Australia</option>
-                        <option value="Germany">Germany</option>
-                        <option value="France">France</option>
-                        <option value="Other">Other International Destination</option>
+                        <option value="">选择国家/地区...</option>
+                        <option value="United States">United States (美国)</option>
+                        <option value="Canada">Canada (加拿大)</option>
+                        <option value="United Kingdom">United Kingdom (英国)</option>
+                        <option value="Australia">Australia (澳大利亚)</option>
+                        <option value="Germany">Germany (德国)</option>
+                        <option value="France">France (法国)</option>
+                        <option value="Other">Other International Destination (其他国际目的地)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="address">Shipping Address *</label>
-                    <textarea id="address" rows="2" required placeholder="Street address, apartment, suite, etc."></textarea>
+                    <label for="address">收件地址 *</label>
+                    <textarea id="address" rows="2" required placeholder="街道地址、公寓、套房等。"></textarea>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="city">City *</label>
+                        <label for="city">城市 *</label>
                         <input type="text" id="city" required>
                     </div>
                     <div class="form-group">
-                        <label for="zipCode">Postal / Zip Code *</label>
+                        <label for="zipCode">邮政编码 *</label>
                         <input type="text" id="zipCode" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="paymentMethod">Payment Preference *</label>
+                    <label for="paymentMethod">付款偏好*</label>
                     <select id="paymentMethod" required>
                         <option value="USDT (TRC20)">USDT (TRC20)</option>
                         <option value="USDT (ERC20)">USDT (ERC20)</option>
                         <option value="Bitcoin (BTC)">Bitcoin (BTC)</option>
-                        <option value="Bank Transfer / Wire">Bank Transfer / Wire</option>
+                        <option value="Bank Transfer / Wire">Bank Transfer / Wire (银行电汇)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="txid">Transaction Hash / TxID (Optional)</label>
-                    <input type="text" id="txid" placeholder="Paste TxID if already paid, or leave blank">
+                    <label for="txid">交易哈希/交易ID (可选)</label>
+                    <input type="text" id="txid" placeholder="如果已付款，请粘贴交易ID；否则留空。">
                 </div>
 
                 <div class="form-group">
-                    <label for="notes">Special Instructions / Order Notes</label>
-                    <textarea id="notes" rows="2" placeholder="Custom packaging requirements, stealth requests, etc."></textarea>
+                    <label for="notes">特殊说明/订单备注</label>
+                    <textarea id="notes" rows="2" placeholder="定制包装要求、隐蔽包装要求等。"></textarea>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submit-btn-text">
-                    <i class="fab fa-whatsapp"></i> Submit Order via WhatsApp
+                    <i class="fab fa-whatsapp"></i> 通过 WhatsApp 提交订单
                 </button>
 
                 <div class="notice-box">
-                    <i class="fas fa-info-circle"></i> After clicking submit, WhatsApp will open with your order summary pre-filled. You can attach payment confirmation or receipt directly in the chat.
+                    <i class="fas fa-info-circle"></i> 点击提交后，将打开 WhatsApp 并预填您的订单摘要。您可以直接在聊天中附上付款凭证或收据。
                 </div>
             </form>
         </div>
@@ -356,13 +356,13 @@
     let currentSubtotal = 0;
     let calculatedShipping = 0;
 
-    // Load Cart Data on Page Initialization
+    // 页面初始化时加载购物车
     document.addEventListener("DOMContentLoaded", function () {
         let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
         if (cart.length === 0) {
             cart = [
-                { id: "P001", name: "Tirzepatide 10mg", price: 35.00, qty: 2 },
-                { id: "P002", name: "Semaglutide 5mg", price: 28.00, qty: 1 }
+                { id: "P001", name: "司美格鲁肽", price: 89.00, qty: 1 },
+                { id: "P002", name: "司美格鲁肽", price: 74.00, qty: 1 }
             ];
             localStorage.setItem('peptides_cart', JSON.stringify(cart));
         }
@@ -375,7 +375,7 @@
         tbody.innerHTML = '';
 
         if (cart.length === 0) {
-            document.getElementById('cart-content').innerHTML = '<div class="empty-cart-msg">Your shopping cart is empty.</div>';
+            document.getElementById('cart-content').innerHTML = '<div class="empty-cart-msg">您的购物车是空的。</div>';
             return;
         }
 
@@ -388,11 +388,11 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${item.name}</strong></td>
-                <td>$${item.price.toFixed(2)}</td>
+                <td>$${item.price.toFixed(2)}美元</td>
                 <td>
                     <input type="number" class="qty-input" value="${item.qty}" min="1" onchange="updateQuantity(${index}, this.value)">
                 </td>
-                <td>$${itemTotal.toFixed(2)}</td>
+                <td>$${itemTotal.toFixed(2)}美元</td>
                 <td><button class="remove-btn" onclick="removeItem(${index})"><i class="fas fa-trash-alt"></i></button></td>
             `;
             tbody.appendChild(tr);
@@ -423,19 +423,19 @@
         if (!country) {
             calculatedShipping = 0;
         } else if (currentSubtotal >= 300) {
-            calculatedShipping = 0; // Free shipping over $300
+            calculatedShipping = 0; // 300以上免运费
         } else {
-            calculatedShipping = 25.00; // Flat express shipping rate
+            calculatedShipping = 40.00; // 300以下运费四十
         }
 
-        document.getElementById('subtotal-val').innerText = `$${currentSubtotal.toFixed(2)}`;
-        document.getElementById('shipping-val').innerText = calculatedShipping === 0 ? "Free Shipping" : `$${calculatedShipping.toFixed(2)}`;
+        document.getElementById('subtotal-val').innerText = `$${currentSubtotal.toFixed(2)}美元`;
+        document.getElementById('shipping-val').innerText = calculatedShipping === 0 ? "免运费" : `$${calculatedShipping.toFixed(2)}美元`;
         
         const grandTotal = currentSubtotal + calculatedShipping;
-        document.getElementById('grand-total-val').innerText = `$${grandTotal.toFixed(2)}`;
+        document.getElementById('grand-total-val').innerText = `$${grandTotal.toFixed(2)}美元`;
     }
 
-    // WhatsApp Backup Order Sender
+    // 通过 WhatsApp 发送订单备份
     function sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText) {
         const fullName = document.getElementById('fullName').value.trim();
         const email = document.getElementById('email').value.trim();
@@ -450,7 +450,7 @@
 
         let itemsText = "";
         cart.forEach(item => {
-            itemsText += `• ${item.name} x ${item.qty} ($${(item.price * item.qty).toFixed(2)})\n`;
+            itemsText += `• ${item.name} x ${item.qty} ($${(item.price * item.qty).toFixed(2)}美元)\n`;
         });
 
         let message = `🛒 *NEW ORDER - PeptidesFactoryCN*\n`;
@@ -462,9 +462,9 @@
         message += `*Shipping Address:*\n`;
         message += `${address}\n${city}, ${zipCode}, ${country}\n\n`;
         message += `*Order Items:*\n${itemsText}\n`;
-        message += `• Subtotal: $${currentSubtotal.toFixed(2)}\n`;
+        message += `• Subtotal: $${currentSubtotal.toFixed(2)}美元\n`;
         message += `• Shipping: ${shippingFeeText}\n`;
-        message += `• *Grand Total: $${grandTotal}*\n\n`;
+        message += `• *Grand Total: $${grandTotal}美元*\n\n`;
         message += `*Payment Method:* ${paymentMethod}\n`;
         if (txid) {
             message += `*TxID / Hash:* ${txid}\n`;
@@ -481,20 +481,20 @@
         window.open(waUrl, '_blank');
     }
 
-    // Direct WhatsApp Submission Handler
+    // 直接通过 WhatsApp 提交订单处理程序
     function submitDirectCryptoOrder() {
         let cart = JSON.parse(localStorage.getItem('peptides_cart')) || [];
         if (cart.length === 0) {
-            alert("Your cart is empty!");
+            alert("您的购物车是空的！");
             return;
         }
 
         var grandTotal = (currentSubtotal + calculatedShipping).toFixed(2);
-        var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}` : "Free Shipping";
+        var shippingFeeText = calculatedShipping > 0 ? `$${calculatedShipping.toFixed(2)}美元` : "免运费";
 
         sendBackupOrderViaWhatsApp(cart, grandTotal, shippingFeeText);
 
-        alert('Redirecting to WhatsApp to send your order! Please remember to attach your payment screenshot in the chat.');
+        alert('正在跳转至 WhatsApp 发送您的订单！请记得在聊天中附上您的付款截图。');
         localStorage.removeItem('peptides_cart');
         location.reload();
     }
